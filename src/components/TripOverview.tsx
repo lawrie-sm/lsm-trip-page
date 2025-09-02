@@ -1,4 +1,4 @@
-import RouteTimeline from './RouteTimeline';
+import RouteTimeline from './RouteTimeLine/RouteTimeline';
 import type { Trip } from "../types";
 
 interface TripOverviewProps {

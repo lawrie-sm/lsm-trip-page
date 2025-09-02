@@ -1,31 +1,12 @@
-import type { LocationTime } from "../types";
-
-type LocationItemStatus = 'scheduled' | 'arrived' | 'departed' | 'skipped' | 'next' | 'unknown';
-
-interface LocationItem {
-    id: number;
-    name: string;
-    status: LocationItemStatus;
-    timeIso: string;
-    timeEstimateIso?: string;
-    timeZone?: string;
-}
-
-interface RouteTimelineProps {
-    route: LocationTime[];
-}
-
-function toLocalDisplayTime(timeIso: string, timeZone?: string): string {
-    return new Intl.DateTimeFormat([], { hour: '2-digit', minute: '2-digit', timeZone: timeZone })
-        .format(new Date(timeIso));
-}
+import type { LocationTime } from "../../types";
+import type { LocationItem, LocationItemStatus } from "./RouteTimeline";
 
 function timeIsoToMinute(s?: string) {
     return s ? Math.floor(new Date(s).getTime() / 60000) : undefined;
 }
 
 // NOTE_LSM: Builds input props, only walks the route once but assumes the route is in order
-function buildLocationItems(route: LocationTime[]): LocationItem[] {
+export function buildLocationItems(route: LocationTime[]): LocationItem[] {
     const locationItems: LocationItem[] = [];
 
     // NOTE_LSM: Determines whether we show the next stop as 'next' or 'scheduled'. Disabled if bus is stopped
@@ -93,56 +74,3 @@ function buildLocationItems(route: LocationTime[]): LocationItem[] {
 
     return locationItems;
 }
-
-interface LocationItemProps {
-    name: string;
-    status: LocationItemStatus;
-    displayTime: string;
-    displayTimeEstimate?: string;
-}
-
-function LocationItem(props: LocationItemProps) {
-    const { name, status, displayTime: time, displayTimeEstimate: timeEstimate } = props;
-
-    return (
-        <li className="location-item">
-            <div className={`location-status-icon ${status}`} />
-            <div className="location-details">
-                <p className="location-name">{name}</p>
-                <p className="location-time">
-                    {time}
-                    {timeEstimate && <span className="time-estimate"> (Est: {timeEstimate})</span>}
-                </p>
-                <p className="location-additional">
-                    {status === 'skipped' && <span className="skipped-label">Skipped</span>}
-                </p>
-            </div>
-        </li>
-    );
-}
-
-function RouteTimeline(props: RouteTimelineProps) {
-    const { route } = props;
-
-    const locationItems = buildLocationItems(route);
-
-    return (
-        <div>
-            <h2>Route Timeline</h2>
-            <ul className="route-timeline">
-            {locationItems.map((loc) => (
-                    <LocationItem
-                        key={loc.id}
-                        name={loc.name}
-                        status={loc.status}
-                        displayTime={toLocalDisplayTime(loc.timeIso, loc.timeZone)}
-                        displayTimeEstimate={loc.timeEstimateIso ? toLocalDisplayTime(loc.timeEstimateIso, loc.timeZone) : undefined}
-                    />
-                ))
-            }
-            </ul>
-        </div>
-    );
-}
-
-export default RouteTimeline;
