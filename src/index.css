@@ -1,0 +1,77 @@
+:root {
+--clr-primary: #386641;
+--clr-secondary: #6A994E;
+--clr-tertiary: #A7D1AB;
+--clr-accent: #D7E4C4;
+--clr-black: #000000;
+--clr-white: #FFFFFF;
+--clr-grey: #818181;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+    padding: 2rem;
+}
+
+.route-timeline {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    align-items: flex-start;
+    color: var(--clr-black);
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.location-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+    font-size: 1.25rem;
+    margin: 0.5rem 0;
+    gap: 2rem;
+}
+
+.location-name {
+    font-weight: bold;
+}
+
+.location-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    align-items: flex-start;
+    gap: 0.25rem;
+}
+
+.location-status-icon {
+    background-color: var(--clr-grey);
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.location-status-icon.departed {
+    background-color: var(--clr-primary);
+}
+
+.location-status-icon.arrived {
+    background-color: var(--clr-black);
+}
+
+.location-status-icon.skipped {
+    background-color: var(--clr-primary);
+}
+
+.location-status-icon.next {
+    background-color: var(--clr-secondary);
+}
+
+.location-status-icon.scheduled {
+    background-color: var(--clr-accent);
+}
