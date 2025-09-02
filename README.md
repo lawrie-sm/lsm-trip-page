@@ -9,6 +9,7 @@
 Timeboxed to ~6hrs
 
 ## Stretch goals
+- SVG line, skipped stops are visually skipped
 - SSR, progressive enhancement, <14kb initial pageload, text message embeds
 - Map with the bus location and stops
 - Vehicle info (WiFi, toilets etc.)
@@ -35,11 +36,7 @@ would need to slot into a larger React-y codebase with a shared component librar
 - Judicious, integration-style testing on the DOM only
 
 ## TODOs
-- Make the locationItems loop testable and separate the rendering logic from the data processing
-- Origin, destination, basic journey info in a title component
-- Live polling and indicator for the next stop
 - Debug dropdown to demo different route states
+- Live polling of API w/ react-query
 - Handling of old data, errors and disconnects
-- Hardcode a switch to use mock time and data for demoing
-- SVG line and lerping
 - Stretch goals

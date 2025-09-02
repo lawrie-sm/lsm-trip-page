@@ -7,8 +7,8 @@ export interface QuotesRes {
 // NOTE_LSM: Some fields omitted for brevity, also location isn't exactly accurate but close enough
 export interface Leg {
     trip_uid: string;
-    origin: Location;
-    destination: Location;
+    origin: Partial<Location>;
+    destination: Partial<Location>;
     departure: string;
     arrival: string;
 }

@@ -41,6 +41,7 @@ export function buildLocationItems(route: LocationTime[]): LocationItem[] {
             const scheduled = locationTime.departure.scheduled;
             const estimated = locationTime.departure.estimated;
             const timesAreDifferent = estimated && timeIsoToMinute(scheduled) !== timeIsoToMinute(estimated);
+
             locationItems.push({
                 id: locationTime.id,
                 name: locationTime.location.name,

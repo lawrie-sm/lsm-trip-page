@@ -1,3 +1,4 @@
+import { toLocalDisplayTime } from "../../time";
 import type { LocationTime } from "../../types";
 import { buildLocationItems } from "./buildLocationItems";
 
@@ -12,13 +13,6 @@ export interface LocationItem {
     timeIso: string;
     timeEstimateIso?: string;
     timeZone?: string;
-}
-
-// Util fn - This would likely moved in with other time display utils
-
-function toLocalDisplayTime(timeIso: string, timeZone?: string): string {
-    return new Intl.DateTimeFormat([], { hour: '2-digit', minute: '2-digit', timeZone: timeZone })
-        .format(new Date(timeIso));
 }
 
 // Components
@@ -43,7 +37,8 @@ function LocationItem(props: LocationItemProps) {
                     {timeEstimate && <span className="time-estimate"> (Est: {timeEstimate})</span>}
                 </p>
                 <p className="location-additional">
-                    {status === 'skipped' && <span className="skipped-label">Skipped</span>}
+                    {status === 'skipped' && <span className="location-extra-label">Skipped</span>}
+                    {status === 'arrived' && <span className="location-extra-label">Stopped</span>}
                 </p>
             </div>
         </li>
@@ -60,21 +55,18 @@ function RouteTimeline(props: RouteTimelineProps) {
     const locationItems = buildLocationItems(route);
 
     return (
-        <div>
-            <h2>Route Timeline</h2>
-            <ul className="route-timeline">
+        <ul className="route-timeline">
             {locationItems.map((loc) => (
-                    <LocationItem
-                        key={loc.id}
-                        name={loc.name}
-                        status={loc.status}
-                        displayTime={toLocalDisplayTime(loc.timeIso, loc.timeZone)}
-                        displayTimeEstimate={loc.timeEstimateIso ? toLocalDisplayTime(loc.timeEstimateIso, loc.timeZone) : undefined}
-                    />
-                ))
+                <LocationItem
+                    key={loc.id}
+                    name={loc.name}
+                    status={loc.status}
+                    displayTime={toLocalDisplayTime(loc.timeIso, loc.timeZone)}
+                    displayTimeEstimate={loc.timeEstimateIso ? toLocalDisplayTime(loc.timeEstimateIso, loc.timeZone) : undefined}
+                />
+            ))
             }
-            </ul>
-        </div>
+        </ul>
     );
 }
 

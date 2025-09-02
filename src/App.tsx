@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { QuotesRes, Trip } from "./types";
 import TripOverview from "./components/TripOverview";
-import { mockTrip } from "./data";
+import { mockQuoteRes, mockTrip } from "./data";
 
 function getQuotesUrl(date: Date) {
     const startOfDay = new Date(date).setUTCHours(0, 0, 0, 0);
@@ -32,7 +32,7 @@ const fetchLatestTrip = async (): Promise<Trip> => {
 }
 
 function App() {
-    const [trip, setTrip] = useState<Trip | null>(null);
+    // const [trip, setTrip] = useState<Trip | null>(null);
     // useEffect(() => {
     //     if (trip) return;
     //     fetchLatestTrip().then((trip) => {
@@ -42,8 +42,14 @@ function App() {
     // if (!trip) {
     //     return <div>Loading...</div>;
     // }
+    //
 
-    return (<TripOverview trip={mockTrip} />);
+
+    const trip = mockTrip;
+
+    console.log({ mockQuoteRes, trip });
+    return (
+        <TripOverview trip={trip} />);
 }
 
 export default App
