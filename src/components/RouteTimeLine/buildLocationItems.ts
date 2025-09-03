@@ -5,38 +5,49 @@ function timeIsoToMinute(s?: string) {
     return s ? Math.floor(new Date(s).getTime() / 60000) : undefined;
 }
 
-// NOTE_LSM: Builds input props, only walks the route once but assumes the route is in order
+/*
+    Converts the API route to a user-friendly list of LocationItems with status and times
+    Assumes the route is in order, that the first stop is the origin, and the last is the destination,
+    Pure, and only walks the route once.
+*/
 export function buildLocationItems(route: LocationTime[]): LocationItem[] {
     const locationItems: LocationItem[] = [];
 
-    // NOTE_LSM: Determines whether we show the next stop as 'next' or 'scheduled'. Disabled if bus is stopped
-    let showNext = true;
+    // These flags track state for showing the onroute "next" status
+    let isStopped = false;
+    let hasNext = false;
+    let hasStarted = false;
 
     for (const locationTime of route) {
+        // Skipped stops pre-empt everything else
         if (locationTime.skipped) {
             locationItems.push({
                 id: locationTime.id,
                 name: locationTime.location.name,
                 status: 'skipped' as LocationItemStatus,
                 timeIso: locationTime.arrival.scheduled,
-                timeZone: locationTime.location.timezone
+                timezone: locationTime.location.timezone
             })
             continue;
         }
 
+        // Bus has departed this stop, and is beyond the origin so journey has started
         if (locationTime.departure.actual) {
+            hasStarted = true;
+
             locationItems.push({
                 id: locationTime.id,
                 name: locationTime.location.name,
                 status: 'departed' as LocationItemStatus,
                 timeIso: locationTime.departure.actual,
-                timeZone: locationTime.location.timezone
+                timezone: locationTime.location.timezone
             });
             continue;
         }
 
+        // Bus has arrived at a stop but not departed
         if (locationTime.arrival.actual) {
-            showNext = false;
+            isStopped = true;
 
             const scheduled = locationTime.departure.scheduled;
             const estimated = locationTime.departure.estimated;
@@ -48,14 +59,15 @@ export function buildLocationItems(route: LocationTime[]): LocationItem[] {
                 status: 'arrived' as LocationItemStatus,
                 timeIso: locationTime.departure.scheduled,
                 timeEstimateIso: timesAreDifferent ? locationTime.departure.estimated : undefined,
-                timeZone: locationTime.location.timezone
+                timezone: locationTime.location.timezone
             });
             continue;
         }
-        
+
+        // Future stops, including potentially a "next" stop
         let status = 'scheduled' as LocationItemStatus;
-        if (showNext) {
-            showNext = false;
+        if (hasStarted && !hasNext && !isStopped) {
+            hasNext = true;
             status = 'next';
         }
 
@@ -69,7 +81,7 @@ export function buildLocationItems(route: LocationTime[]): LocationItem[] {
             status: status,
             timeIso: locationTime.arrival.scheduled,
             timeEstimateIso: timesAreDifferent ? locationTime.arrival.estimated : undefined,
-            timeZone: locationTime.location.timezone
+            timezone: locationTime.location.timezone
         });
     };
 

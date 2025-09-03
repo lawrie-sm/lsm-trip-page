@@ -7,24 +7,18 @@ import RouteTimeline from './RouteTimeline';
 
 export function makeMockLocationTime(ltPartial: Partial<LocationTime> & {
     id?: number;
-    name?: string;
-    timeZone?: string;
-    arrSched?: string;
-    depSched?: string;
+    timezone?: string;
 } = {}): LocationTime {
     const id = ltPartial.id ?? 1;
-    const name = ltPartial.name ?? 'Stop ' + id;
-    const timeZone = ltPartial.timeZone ?? 'UTC';
-    const arrSched = ltPartial.arrSched ?? '2025-09-02T10:00:00Z';
-    const depSched = ltPartial.depSched ?? '2025-09-02T10:05:00Z';
+    const timezone = ltPartial.timezone ?? 'UTC';
 
     return {
         id,
         skipped: false,
         location: {
             id,
-            name,
-            timezone: timeZone,
+            name: `Stop ${id}`,
+            timezone,
             type: 'STOP_POINT',
             region_name: '',
             code: '',
@@ -39,13 +33,13 @@ export function makeMockLocationTime(ltPartial: Partial<LocationTime> & {
             area_id: 0,
         },
         arrival: {
-            scheduled: arrSched,
+            scheduled: '2025-09-02T10:00:00Z',
             actual: undefined,
             estimated: undefined,
             ...(ltPartial.arrival ?? {}),
         },
         departure: {
-            scheduled: depSched,
+            scheduled: '2025-09-02T10:05:00Z',
             actual: undefined,
             estimated: undefined,
             ...(ltPartial.departure ?? {}),
@@ -80,7 +74,7 @@ describe('RouteTimeline render smoke', () => {
         const { container } = render(<RouteTimeline route={route} />);
 
         expect(container.querySelectorAll('li.location-item')).toHaveLength(3);
-        expect(container.querySelectorAll('.location-status-icon.next')).toHaveLength(1);
+        expect(container.querySelectorAll('[data-status="next"]')).toHaveLength(1);
         expect(screen.getByText('Stop 2')).toBeInTheDocument();
         expect(screen.getByText('Skipped')).toBeInTheDocument();
         expect(screen.getByText(/\(Est:/)).toBeInTheDocument();

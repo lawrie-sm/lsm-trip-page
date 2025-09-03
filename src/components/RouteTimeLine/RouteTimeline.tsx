@@ -1,8 +1,7 @@
+import { useStrings } from "../../strings";
 import { toLocalDisplayTime } from "../../time";
 import type { LocationTime } from "../../types";
 import { buildLocationItems } from "./buildLocationItems";
-
-// Shared types
 
 export type LocationItemStatus = 'scheduled' | 'arrived' | 'departed' | 'skipped' | 'next' | 'unknown';
 
@@ -12,34 +11,71 @@ export interface LocationItem {
     status: LocationItemStatus;
     timeIso: string;
     timeEstimateIso?: string;
-    timeZone?: string;
+    timezone?: string;
 }
 
-// Components
 
 interface LocationItemProps {
     name: string;
     status: LocationItemStatus;
-    displayTime: string;
-    displayTimeEstimate?: string;
+    timeIso: string;
+    timeEstimateIso?: string;
+    timezone?: string;
 }
 
 function LocationItem(props: LocationItemProps) {
-    const { name, status, displayTime: time, displayTimeEstimate: timeEstimate } = props;
+    const {
+        name,
+        status,
+        timeIso,
+        timeEstimateIso,
+        timezone,
+    } = props;
+
+    const isCurrent = status === 'next' || status === 'arrived';
+    const strings = useStrings();
 
     return (
-        <li className="location-item">
-            <div className={`location-status-icon ${status}`} />
+        <li
+            className="location-item"
+            data-status={status}
+            aria-current={isCurrent ? 'step' : undefined}
+        >
+            <div className="location-status-icon" aria-hidden="true" />
+
             <div className="location-details">
                 <p className="location-name">{name}</p>
-                <p className="location-time">
-                    {time}
-                    {timeEstimate && <span className="time-estimate"> (Est: {timeEstimate})</span>}
-                </p>
-                <p className="location-additional">
-                    {status === 'skipped' && <span className="location-extra-label">Skipped</span>}
-                    {status === 'arrived' && <span className="location-extra-label">Stopped</span>}
-                </p>
+
+                {strings.status[status].label && (
+                    <p className="location-time">
+                        <span className="location-label">
+                            {strings.status[status].label}
+                        </span>
+                        {' '}
+                        <time dateTime={timeIso}>
+                            {toLocalDisplayTime(timeIso, timezone)}
+                        </time>
+
+                        {timeEstimateIso && (
+                            <span className="time-estimate">
+                                {' '}
+                                (
+                                {strings.estimate.label}
+                                {' '}
+                                <time dateTime={timeEstimateIso}>
+                                    {toLocalDisplayTime(timeEstimateIso, timezone)}
+                                </time>
+                                )
+                            </span>
+                        )}
+                    </p>
+                )}
+
+                {strings.status[status].extra && (
+                    <p className="location-additional">
+                        {strings.status[status].extra}
+                    </p>
+                )}
             </div>
         </li>
     );
@@ -52,21 +88,25 @@ interface RouteTimelineProps {
 function RouteTimeline(props: RouteTimelineProps) {
     const { route } = props;
 
+    // We might want to memoize this, probably overkill
     const locationItems = buildLocationItems(route);
 
     return (
-        <ul className="route-timeline">
-            {locationItems.map((loc) => (
-                <LocationItem
-                    key={loc.id}
-                    name={loc.name}
-                    status={loc.status}
-                    displayTime={toLocalDisplayTime(loc.timeIso, loc.timeZone)}
-                    displayTimeEstimate={loc.timeEstimateIso ? toLocalDisplayTime(loc.timeEstimateIso, loc.timeZone) : undefined}
-                />
-            ))
+        <ol className="route-timeline" aria-label="Trip progress">
+            {locationItems.map((loc) => {
+                return (
+                    <LocationItem
+                        key={loc.id}
+                        name={loc.name}
+                        status={loc.status}
+                        timeIso={loc.timeIso}
+                        timeEstimateIso={loc.timeEstimateIso}
+                        timezone={loc.timezone}
+                    />
+                )
+            })
             }
-        </ul>
+        </ol>
     );
 }
 

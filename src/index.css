@@ -1,10 +1,12 @@
 /* Variables */
 
+/* These should be checked against WCAG contrast ratios (https://webaim.org/resources/contrastchecker/) esp. for text */
+
 :root {
 --clr-primary: #386641;
 --clr-secondary: #6A994E;
 --clr-tertiary: #A7D1AB;
---clr-accent: #D7E4C4;
+--clr-accent: #ABCF78;
 --clr-black: #000000;
 --clr-white: #FFFFFF;
 --clr-grey: #818181;
@@ -12,6 +14,8 @@
 }
 
 /* Global */
+
+/* Animations should be disabled if user has "prefers-reduced-motion" enabled, but I do on my dev machine, so I left this out */
 
 @keyframes pulse {
   0%   { transform: scale(1);    box-shadow: 0 0 0 0      #6A994E66; }
@@ -26,6 +30,17 @@
     align-items: center;
     font-family: 'Arial', sans-serif;
     padding: 2rem;
+}
+
+.loader {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 3rem;
+    color: var(--clr-grey);
+    height: 100vh;
 }
 
 /* Header */
@@ -77,37 +92,21 @@
     gap: 0.25rem;
 }
 
-.location-status-icon {
-    background-color: var(--clr-grey);
-    border-radius: 50%;
-    width: 1.5rem;
-    height: 1.5rem;
-}
-
-.location-status-icon.departed {
-    background-color: var(--clr-primary);
-}
-
-.location-status-icon.arrived {
-    background-color: var(--clr-black);
-}
-
-.location-status-icon.skipped {
-    background-color: var(--clr-primary);
-}
-
-.location-status-icon.next {
-    background-color: var(--clr-secondary);
-
-    /* NOTE_LSM: Should be disabled if user has "prefers-reduced-motion" enabled, but I do on my dev machine, so I left this out */
-    animation: pulse 1.6s ease-in-out infinite;
-    transform-origin: center;
-}
-
-.location-status-icon.scheduled {
-    background-color: var(--clr-accent);
-}
-
-.location-extra-label {
+.location-additional {
     font-style: italic;
 }
+
+.location-status-icon {
+  background-color: var(--status-bg, var(--clr-grey));
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  animation: var(--status-anim, none);
+  transform-origin: center;
+}
+
+.location-item[data-status="departed"]  { --status-bg: var(--clr-primary); }
+.location-item[data-status="skipped"]   { --status-bg: var(--clr-primary); }
+.location-item[data-status="arrived"]   { --status-bg: var(--clr-black); --status-anim: pulse 1.6s ease-in-out infinite; }
+.location-item[data-status="next"]      { --status-bg: var(--clr-secondary); --status-anim: pulse 1.6s ease-in-out infinite; }
+.location-item[data-status="scheduled"] { --status-bg: var(--clr-accent); }

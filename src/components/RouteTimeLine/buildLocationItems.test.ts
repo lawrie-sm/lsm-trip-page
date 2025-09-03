@@ -7,7 +7,7 @@ describe('buildLocationItems', () => {
         expect(buildLocationItems([])).toEqual([]);
     });
 
-    it('marks first untouched stop as next and others as scheduled', () => {
+    it('marks first untouched stop as next and others as scheduled, if we have departed origin', () => {
         const route = [
             makeMockLocationTime({ id: 1, departure: { scheduled: '2025-09-02T09:00:00Z', actual: '2025-09-02T09:02:00Z' } }),
             makeMockLocationTime({ id: 2 }),
@@ -22,9 +22,14 @@ describe('buildLocationItems', () => {
         ]);
     });
 
-    it('when bus is stopped (arrival.actual present), disables next for subsequent stops', () => {
+    it('when bus is stopped (arrival.actual present but no departure), disables next for subsequent stops', () => {
         const route = [
-            makeMockLocationTime({ id: 1, arrival: { scheduled: '2025-09-02T09:50:00Z', actual: '2025-09-02T09:51:00Z' }, depSched: '2025-09-02T09:55:00Z' }),
+            makeMockLocationTime({
+                id: 1,
+                arrival: { scheduled: '2025-09-02T09:50:00Z', actual: '2025-09-02T09:51:00Z' },
+                departure: { scheduled: '2025-09-02T09:55:00Z' }
+            }),
+
             makeMockLocationTime({ id: 2 }),
             makeMockLocationTime({ id: 3 }),
         ];
@@ -35,8 +40,18 @@ describe('buildLocationItems', () => {
         expect(out.some(x => x.status === 'next')).toBe(false);
     });
 
+    it('when bus has not started route (no arrival.actual on origin), disables next for subsequent stops', () => {
+        const route = [
+            makeMockLocationTime({ id: 1 }),
+            makeMockLocationTime({ id: 2 }),
+        ];
+
+        const out = buildLocationItems(route);
+        expect(out.some(x => x.status === 'next')).toBe(false);
+    });
+
     it('skipped uses arrival.scheduled as time and status skipped', () => {
-        const route = [makeMockLocationTime({ id: 1, skipped: true, arrSched: '2025-09-02T08:00:00Z' })];
+        const route = [makeMockLocationTime({ id: 1, skipped: true, arrival: { scheduled: '2025-09-02T08:00:00Z' } })];
 
         const out = buildLocationItems(route);
         expect(out[0]).toMatchObject({
@@ -57,7 +72,7 @@ describe('buildLocationItems', () => {
         });
     });
 
-    it('arrived uses departure.scheduled as main time, estimate only if minute changes', () => {
+    it('arrived displays departure.scheduled as time, shows estimate only if minute is different', () => {
         const route = [
 
             // Estimate is same minute, so not displayed
@@ -90,38 +105,35 @@ describe('buildLocationItems', () => {
         });
     });
 
-    it('scheduled item carries arrival estimate only if minute changes', () => {
+    it('scheduled shows arrival.scheduled as time, displays estimate only if minute changes', () => {
         const route = [
+
+            // Minutes are the same, so estimate not shown
             makeMockLocationTime({
                 id: 1,
-                arrival: { scheduled: '2025-09-02T11:00:00Z', estimated: '2025-09-02T11:00:59Z' }, // same minute
+                arrival: { scheduled: '2025-09-02T11:00:00Z', estimated: '2025-09-02T11:00:59Z' }, 
             }),
+
+            // Minutes differ, so estimate is shown
             makeMockLocationTime({
                 id: 2,
-                arrival: { scheduled: '2025-09-02T11:10:00Z', estimated: '2025-09-02T11:11:00Z' }, // different minute
+                arrival: { scheduled: '2025-09-02T11:10:00Z', estimated: '2025-09-02T11:11:00Z' },
             }),
         ];
 
         const out = buildLocationItems(route);
-        expect(out[0]).toMatchObject({ id: 1, status: 'next', timeEstimateIso: undefined });
+        expect(out[0]).toMatchObject({ id: 1, status: 'scheduled', timeEstimateIso: undefined });
         expect(out[1]).toMatchObject({ id: 2, status: 'scheduled', timeEstimateIso: '2025-09-02T11:11:00Z' });
     });
 
     it('passes through per-stop timezone', () => {
         const route = [
-            makeMockLocationTime({ id: 1, timeZone: 'Europe/London' }),
-            makeMockLocationTime({ id: 2, timeZone: 'Europe/Berlin' }),
+            makeMockLocationTime({ id: 1, timezone: 'Europe/London' }),
+            makeMockLocationTime({ id: 2, timezone: 'Europe/Berlin' }),
         ];
 
         const out = buildLocationItems(route);
-        expect(out[0].timeZone).toBe('Europe/London');
-        expect(out[1].timeZone).toBe('Europe/Berlin');
-    });
-
-    it('set at most one next status when not stopped', () => {
-        const route = [makeMockLocationTime({ id: 1 }), makeMockLocationTime({ id: 2 }), makeMockLocationTime({ id: 3 })];
-
-        const out = buildLocationItems(route);
-        expect(out.filter(x => x.status === 'next')).toHaveLength(1);
+        expect(out[0].timezone).toBe('Europe/London');
+        expect(out[1].timezone).toBe('Europe/Berlin');
     });
 });
