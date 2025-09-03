@@ -4,7 +4,7 @@
 - `npm install`
 - `npm run dev`
 - Open `http://localhost:5173`. This will return the trip associated with the first leg of the first quote from the API. If the API request fails, it will use mock data
-- Mock data can also be manually selected to demonstrate different states. Try `?data=moving`, `stopped`, and `scheduled`.
+- Mock data can also be manually selected with URL query params. Try `?data=moving`, `stopped`, or `scheduled`.
 - French localisation can be demoed by adding `&lang=fr`, (`lang=en-GB` also works but it's the default)
 - For tests, run `npm test`
 

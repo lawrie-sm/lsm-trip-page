@@ -88,8 +88,9 @@ interface RouteTimelineProps {
 function RouteTimeline(props: RouteTimelineProps) {
     const { route } = props;
 
-    // We might want to memoize this, probably overkill
     const { strings } = useStrings();
+
+    // We might want to memoize this, probably overkill
     const locationItems = buildLocationItems(route);
 
     return (
