@@ -1606,6 +1606,12 @@ export const mockDundeeTripScheduled: Trip = {
             "longitude": -4.54408,
             "latitude": 55.9441583,
             "heading": 138
+        },
+        "secondary_gps": {
+            "last_updated": "2025-09-03T10:44:17.780000+01:00",
+            "longitude": -4.54408,
+            "latitude": 55.9441583,
+            "heading": 138
         }
     },
     "description": {
@@ -1616,4 +1622,4 @@ export const mockDundeeTripScheduled: Trip = {
         "is_cancelled": false,
         "route_id": 1
     }
-} as Trip;
+}

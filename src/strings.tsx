@@ -1,6 +1,6 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 
-// We would normally use i18n for this. Also we probably want screen reader specific labels
+// We would normally use i18n for this, which can be typed properly. Also we probably want screen reader specific labels
 
 type Locale = 'en-GB' | 'fr';
 
@@ -9,7 +9,7 @@ const strings: Record<Locale, any> = {
     'en-GB': {
         status: {
             scheduled: { label: "Scheduled:" },
-            arrived: { label: "Arrival:", extra: "Boarding" },
+            arrived: { label: "Departing:", extra: "Boarding" },
             departed: { label: "Departed:" },
             skipped: { extra: "Skipped" },
             next: { label: "Next stop:" },
@@ -17,6 +17,7 @@ const strings: Record<Locale, any> = {
         },
         estimate: { label: "Est:" },
         header: { to: "to", route: "Route" },
+        tripProgress: { label: "Trip progress" },
     },
     fr: {
         status: {
@@ -29,6 +30,7 @@ const strings: Record<Locale, any> = {
         },
         estimate: { label: "Est. :" },
         header: { to: "à", route: "Ligne" },
+        tripProgress: { label: "Progression du voyage" },
     },
 };
 
@@ -38,9 +40,9 @@ const StringsContext = createContext<Record<string, any>>(strings['en-GB']);
 // eslint-disable-next-line react-refresh/only-export-components
 export const useStrings = () => useContext(StringsContext);
 
-export function StringsProvider({ locale, children }: { locale: string | null; children: React.ReactNode; }) {
+export function StringsProvider({ locale, children }: { locale: string | null; children: ReactNode; }) {
     const loc: Locale = /^fr/i.test(locale ?? "") ? "fr" : "en-GB";
-    const value = strings[loc];
+    const value = { strings: strings[loc], locale: loc };
     return (
         <StringsContext.Provider value={value}>
             {children}

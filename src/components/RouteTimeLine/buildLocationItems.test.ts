@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildLocationItems } from './buildLocationItems';
-import { makeMockLocationTime } from './RouteTimeline.test';
+import { makeMockLocationTime } from '../../test/helpers';
 
 describe('buildLocationItems', () => {
     it('returns [] when route is empty', () => {

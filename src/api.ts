@@ -3,7 +3,7 @@ import type { QuotesRes, Trip } from "./types";
 /*
     Many things missing here, skipped to focus on the core task:
     - Polling for updates
-    - Validation, rendering logic is much easier with fewer optionals
+    - Better validation, zod etc.
     - Error handling and display
     - Check vehicle.gps.last_updated and warn about staleness, keep an eye on users's connection state
     - Caching, for example with react-query
@@ -22,17 +22,29 @@ function getTripUrl(tripId: string) {
     return `https://api.ember.to/v1/trips/${tripId}/`;
 }
 
-export async function fetchTrip(): Promise<Trip> {
+export async function fetchTrip(signal: AbortSignal): Promise<Trip> {
     const today = new Date();
     const quotesUrl = getQuotesUrl(today);
-    const quotesRes = await fetch(quotesUrl);
+    const quotesRes = await fetch(quotesUrl, { signal });
+    if (!quotesRes.ok) {
+        throw new Error(`Quotes request failed ${quotesRes.status}`);
+    }
+
     const quotesJson: QuotesRes = await quotesRes.json();
-    console.log({ quotesJson });
+    if (quotesJson.quotes.length === 0 || quotesJson.quotes[0].legs.length === 0) {
+        throw new Error('No trips found');
+    }
 
     const tripUid = quotesJson.quotes[0].legs[0].trip_uid;
-    const tripsRes = await fetch(getTripUrl(tripUid));
+    const tripsRes = await fetch(getTripUrl(tripUid), { signal });
+    if (!tripsRes.ok) {
+        throw new Error(`Trip request failed ${tripsRes.status}`);
+    }
+
     const tripJson: Trip = await tripsRes.json();
-    console.log({ tripJson });
+    if (tripJson.route.length === 0) {
+        throw new Error('Trip has no route');
+    }
 
     return tripJson;
 }

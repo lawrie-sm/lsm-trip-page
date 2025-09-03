@@ -3,8 +3,9 @@
 ## Usage
 - `npm install`
 - `npm run dev`
-- Open `http://localhost:5173`.
-- By default, it will use the API, but it supports mock data and localisation with query strings. Try `?data=moving&lang=fr` for example
+- Open `http://localhost:5173`. This will return the trip associated with the first leg of the first quote from the API. If the API request fails, it will use mock data
+- Mock data can also be manually selected to demonstrate different states. Try `?data=moving`, `stopped`, and `scheduled`.
+- French localisation can be demoed by adding `&lang=fr`, (`lang=en-GB` also works but it's the default)
 - For tests, run `npm test`
 
 ## Core requirements
@@ -23,14 +24,14 @@ Timeboxed to ~6hrs
 - Some basic integration and unit tests where appropriate
 
 ## Tech decisions
-- I used clientside rendered React page with Vite. Simple and I'm familiar with it. Also assumed something like this would need to slot into a larger React-y codebase with a shared component library etc. Normally for a task like this a basic MVC-style server-rendered app would be fine
-- Grabbed the API data and hardcoded it alongside generated types for quick dev without constantly hitting the API itself. I didn't focus on writing an extensive API client in this exercise. I've left notes instead on this in the api.ts file
+- Client-rendered React, built with Vite and Vitest for testing. Simple and I'm familiar with it. Also assumed something like this would need to slot into a larger React-y codebase with a shared component library etc. Normally for a task like this a basic MVC-style server-rendered app would be fine
+- I didn't focus on writing an extensive API client in this exercise. I've left notes instead on this in the api.ts file. Most dev work was done against mock data to avoid hitting the real API repeatedly
 - CSS was kept vanilla for the sake of time
-- Most of the time was spent handling edge cases and polishing the timeline. I used spare time to add tests and localisation since these were low hanging fruit
+- Most of my time was spent handling edge cases on time displays and polishing the timeline. Also added tests and localisation since these were low hanging fruit
 
 ## Considered but not implemented
-- Cancelled trip handling, we would not want to ship without this. But it's a simple check so I skipped it here
+- Cancelled trip handling. We would not want to ship without this. But it's such a simple addition and probably not interesting to discuss
 - SSR, progressive enhancement, <14kb initial pageload, text message embeds etc. All quite good if the plan is to text direct links to passengers who might have spotty data
-- A map element with the bus location, stops etc.
+- A map element with the bus location, stops etc. Fast to add with a mapping library since we have coords, but I wouldn't be able to polish it
 - Vehicle info (WiFi, toilets etc.)
 - Clear information about the nearest stop, e.g directions, stop URL, or a streeview-style image, could be user location aware

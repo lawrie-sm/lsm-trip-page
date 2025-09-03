@@ -33,7 +33,7 @@ function LocationItem(props: LocationItemProps) {
     } = props;
 
     const isCurrent = status === 'next' || status === 'arrived';
-    const strings = useStrings();
+    const { strings, locale } = useStrings();
 
     return (
         <li
@@ -53,7 +53,7 @@ function LocationItem(props: LocationItemProps) {
                         </span>
                         {' '}
                         <time dateTime={timeIso}>
-                            {toLocalDisplayTime(timeIso, timezone)}
+                            {toLocalDisplayTime(timeIso, timezone, locale)}
                         </time>
 
                         {timeEstimateIso && (
@@ -63,7 +63,7 @@ function LocationItem(props: LocationItemProps) {
                                 {strings.estimate.label}
                                 {' '}
                                 <time dateTime={timeEstimateIso}>
-                                    {toLocalDisplayTime(timeEstimateIso, timezone)}
+                                    {toLocalDisplayTime(timeEstimateIso, timezone, locale)}
                                 </time>
                                 )
                             </span>
@@ -89,10 +89,11 @@ function RouteTimeline(props: RouteTimelineProps) {
     const { route } = props;
 
     // We might want to memoize this, probably overkill
+    const { strings } = useStrings();
     const locationItems = buildLocationItems(route);
 
     return (
-        <ol className="route-timeline" aria-label="Trip progress">
+        <ol className="route-timeline" aria-label={strings.tripProgress.label}>
             {locationItems.map((loc) => {
                 return (
                     <LocationItem
