@@ -14,14 +14,15 @@
 - The current location of the bus on some kind of stepper showing past and future stops
 - The bus's next stop prominently highlighted, or the current stop if it's boarding
 - Show estimated arrival or departure times in a context-sensitive way
-Timeboxed to ~6hrs
+
+This was timeboxed to ~6hrs.
 
 ## Feature list
 - Route timeline with context-sensitive labelling for past, current, next, and future stops. Avoids overloading the user with all six arrival/departure times
 - Header with origin, destination and route number
-- Hand-rolled localisation, i18n-style without the full dependency
-- Accessibility basics, semantic HTML and aria attrs in the timeline component
-- Some basic integration and unit tests where appropriate
+- Localisation, i18n-style without the full dependency
+- Accessibility basics, semantic HTML and aria attributes
+- Some basic testing where appropriate
 
 ## Tech decisions
 - Client-rendered React, built with Vite and Vitest for testing. Simple and I'm familiar with it. Also assumed something like this would need to slot into a larger React-y codebase with a shared component library etc. Normally for a task like this a basic MVC-style server-rendered app would be fine
